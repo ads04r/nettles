@@ -1,0 +1,35 @@
+#!/usr/bin/python
+
+from bs4 import BeautifulSoup
+import sys,random,mechanize
+
+if len(sys.argv) != 2:
+	print "Usage: sting [url]"
+	exit()
+
+agents = ["Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0","Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:25.0) Gecko/20100101 Firefox/25.0","Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:24.0) Gecko/20100101 Firefox/24.0","Mozilla/5.0 (Windows NT 6.0; WOW64; rv:24.0) Gecko/20100101 Firefox/24.0","Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:24.0) Gecko/20100101 Firefox/24.0","Mozilla/5.0 (Windows NT 6.2; rv:22.0) Gecko/20130405 Firefox/23.0","Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20130406 Firefox/23.0","Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:23.0) Gecko/20131011 Firefox/23.0","Mozilla/5.0 (Windows NT 6.2; rv:22.0) Gecko/20130405 Firefox/22.0","Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:22.0) Gecko/20130328 Firefox/22.0","Mozilla/5.0 (Windows NT 6.1; rv:22.0) Gecko/20130405 Firefox/22.0","Mozilla/5.0 (Windows NT 6.2; Win64; x64; rv:16.0.1) Gecko/20121011 Firefox/21.0.1","Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:16.0.1) Gecko/20121011 Firefox/21.0.1","Mozilla/5.0 (Windows NT 6.2; Win64; x64; rv:21.0.0) Gecko/20121011 Firefox/21.0.0"]
+names = ["david","mandy","phil"]
+email = ["yahoo.com","gmail.com","hotmail.com"]
+words = ["stoat","wobble","bing","twunt","stinger","pants"]
+
+agent = random.choice(agents)
+email = random.choice(names) + str(random.randint(111,2014)) + '@' + random.choice(email)
+password = random.choice(words) + random.choice(words) + str(random.randint(1, 456))
+
+url = sys.argv[1]
+br = mechanize.Browser()
+br.set_handle_robots(False)
+br.set_handle_refresh(False)
+br.addheaders = [('User-agent', agent)]
+br.set_handle_refresh(mechanize._http.HTTPRefreshProcessor(), max_time=5)
+
+response = br.open(url)
+br.form = list(br.forms())[0]
+for control in br.form.controls:
+	if control.type == "text":
+		control.value = email
+	if control.type == "password":
+		control.value = password
+
+response = br.submit()
+print str(len(response.get_data())) + " bytes returned."
